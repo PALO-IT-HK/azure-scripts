@@ -11,13 +11,15 @@ For ($i = 1; $i -lt 3; $i++)
     -Name $vmName `
     -ResourceGroupName $resourceGroup
 
-  $job = Remove-AzVm `
+  Remove-AzVm `
     -ResourceGroupName $resourceGroup `
-    -Name $vmName
-  $job
-  Wait-Job -Id $job.Id
+    -Name $vmName `
+    -Force
 
-  $vm | Remove-AzNetworkInterface –Force
+  Remove-AzNetworkInterface `
+    -ResourceGroup $resourceGroup `
+    -Name $vmName"VMNic" `
+    –Force
 
   Get-AzDisk `
     -ResourceGroupName $resourceGroup `
@@ -26,16 +28,16 @@ For ($i = 1; $i -lt 3; $i++)
 
   Get-AzVirtualNetwork `
     -ResourceGroup $resourceGroup `
-    -Name $vmName `
+    -Name $vmName"VNET" `
     | Remove-AzVirtualNetwork -Force
 
   Get-AzNetworkSecurityGroup `
     -ResourceGroup $resourceGroup `
-    -Name $vmName `
+    -Name $vmName"NSG" `
     | Remove-AzNetworkSecurityGroup -Force
 
   Get-AzPublicIpAddress `
     -ResourceGroup $resourceGroup `
-    -Name $vmName `
+    -Name $vmName"PublicIP" `
     | Remove-AzPublicIpAddress -Force
 }
