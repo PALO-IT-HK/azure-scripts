@@ -6,5 +6,6 @@ Write-Host "Creating VM: " $vmName
 New-AzVm `
   -ResourceGroupName $resourceGroup `
   -Name $vmName `
-  -Credential $adminCredential `
-  -Image UbuntuLTS
+  -Credential $adminCredential
+  #Win2016Datacenter, Win2012R2Datacenter, Win2012Datacenter, Win2008R2SP1, UbuntuLTS, CentOS, CoreOS, Debian, openSUSE-Leap, RHEL, SLES
+  # -Image UbuntuLTS
