@@ -5,14 +5,22 @@
     "location": {
       "value": "eastasia"
     },
-    "virtualMachineName": {
-      "value": "clemykingvm"
+    "projectName": {
+      "value": "clemyking"
     },
     "adminUsername": {
       "value": "cchchoi1986"
     },
     "adminPassword": {
-      "value": "Admin1234567"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/c045ba28-d976-44b1-8556-c99c347ed5eb/resourceGroups/TrainingResource/providers/Microsoft.KeyVault/vaults/clemykingkeyvault"
+        },
+        "secretName": "AdminSecret"
+      }
+    },
+    "numberOfStorageAccounts": {
+      "value": 2
     }
   }
 }

@@ -41,9 +41,12 @@ param(
  $deploymentName,
 
  [string]
+#  $templateFilePath = "azuredeploy.json",
+#  $templateFilePath = "linkedtemplate.json",
  $templateFilePath = "template.json",
 
  [string]
+#  $parametersFilePath = "linked-parameters.json"
  $parametersFilePath = "parameters.json"
 )
 
@@ -73,6 +76,22 @@ $ErrorActionPreference = "Stop"
 # select subscription
 Write-Host "Selecting subscription '$subscriptionId'";
 Select-AzSubscription -SubscriptionID $subscriptionId;
+
+if(Test-Path $parametersFilePath) {
+  Write-Host "Validating Template"
+  $TestResult = Test-AzResourceGroupDeployment `
+    -ResourceGroupName $resourceGroupName `
+    -TemplateFile $templateFilePath `
+    -TemplateParameterFile $parametersFilePath;
+  $TestResultCode = ($TestResult).Code;
+
+  if ($TestResultCode -eq 'InvalidTemplate') {
+    Write-Host "Template is Invalid"
+    $TestResult
+    Break;
+  }
+  Write-Host "Template is Valid"
+}
 
 # Register RPs
 $resourceProviders = @("microsoft.storage","microsoft.network","microsoft.compute","microsoft.storage");
@@ -105,18 +124,14 @@ else{
 # Start the deployment
 Write-Host "Starting deployment...";
 if(Test-Path $parametersFilePath) {
-  Test-AzResourceGroupDeployment `
+  Write-Host "From parameters"
+  New-AzResourceGroupDeployment `
     -ResourceGroupName $resourceGroupName `
     -TemplateFile $templateFilePath `
     -TemplateParameterFile $parametersFilePath;
-  # New-AzResourceGroupDeployment `
-  #   -ResourceGroupName $resourceGroupName `
-  #   -Name $deploymentName `
-  #   -TemplateFile $templateFilePath `
-  #   -TemplateParameterFile $parametersFilePath;
 } else {
+  Write-Host "Not from parameters"
   New-AzResourceGroupDeployment `
     -ResourceGroupName $resourceGroupName `
-    -Name $deploymentName `
     -TemplateFile $templateFilePath;
 }
