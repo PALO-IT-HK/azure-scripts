@@ -2,7 +2,7 @@
 $projectNamePrefix = 'clemykinglinked'
 
 # $location = Read-Host -Prompt "Enter a location (i.e. centralus)"
-$location = 'eastasia'
+$location = 'japaneast'
 
 # $resourceGroupName = $projectNamePrefix + "rg"
 $resourceGroupName = "TrainingResource"
@@ -22,7 +22,7 @@ $storageAccount = Get-AzStorageAccount `
   -ResourceGroupName $resourceGroupName `
   -Name $storageAccountName;
 
-if(!$storageAccount.Id) {
+if(!$storageAccount.Id -and $storageAccount.ProvisioningState -eq 'Running') {
   # Create a storage account
   $storageAccount = New-AzStorageAccount `
     -ResourceGroupName $resourceGroupName `

@@ -2,13 +2,6 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Location for all resources."
-      }
-    },
     "projectName": {
       "type": "string"
     },
@@ -86,12 +79,13 @@
       "defaultValue": {
         "signedServices": "b",
         "signedPermission": "rw",
-        "signedExpiry": "2019-05-01T00:00:01Z",
+        "signedExpiry": "2019-12-01T00:00:00Z",
         "signedResourceTypes": "o"
       }
     }
   },
   "variables": {
+    "systemAssignedManagedId": "[concat(parameters('projectName'), 'sysmaid')]",
     "networkInterfaceName": "[concat(parameters('projectName'), '-nin')]",
     "networkSecurityGroupName": "[concat(parameters('projectName'), '-nsg')]",
     "virtualNetworkName": "[concat(parameters('projectName'), '-vnet')]",
@@ -119,7 +113,7 @@
             "value": "[variables('diagnosticsStorageAccountName')]"
           },
           "location":{
-            "value": "[parameters('location')]"
+            "value": "[resourceGroup().location]"
           },
           "numberOf": {
             "value": "[parameters('numberOfStorageAccounts')]"
@@ -131,7 +125,7 @@
       "name": "[variables('publicIpAddressName')]",
       "type": "Microsoft.Network/publicIpAddresses",
       "apiVersion": "2018-08-01",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "properties": {
         "publicIpAllocationMethod": "Dynamic"
       },
@@ -153,7 +147,7 @@
             "value": "[variables('virtualNetworkName')]"
           },
           "location":{
-            "value": "[parameters('location')]"
+            "value": "[resourceGroup().location]"
           }
         }
       }
@@ -162,7 +156,7 @@
       "name": "[variables('networkInterfaceName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2018-10-01",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
         "virtualNetworkLinkedTemplate",
@@ -192,16 +186,47 @@
       "name": "[variables('networkSecurityGroupName')]",
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2018-08-01",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "properties": {
-        "securityRules": []
+        "securityRules": [
+          {
+            "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'), '/securityRules/ssh')]",
+            "name": "ssh",
+            "properties": {
+              "description": "default-allow-ssh",
+              "sourcePortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "protocol": "*",
+              "access": "Allow",
+              "direction": "Inbound",
+              "destinationPortRange": "22",
+              "priority": 100
+            }
+          },
+          {
+            "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'), '/securityRules/Port-80')]",
+            "name": "Port-80",
+            "properties": {
+              "description": "default-allow-port-80",
+              "sourcePortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "protocol": "*",
+              "access": "Allow",
+              "direction": "Inbound",
+              "destinationPortRange": "80",
+              "priority": 200
+            }
+          }
+        ]
       }
     },
     {
       "name": "[variables('virtualMachineName')]",
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2018-06-01",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/',variables('networkInterfaceName'))]",
         "storageAccountLinkedTemplate"
@@ -242,6 +267,14 @@
             "storageUri": "[reference('storageAccountLinkedTemplate').outputs.storageUri.value]"
           }
         }
+      },
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[resourceID('Microsoft.ManagedIdentity/userAssignedIdentities/','uamid')]": {
+
+          }
+       }
       }
     }
   ],

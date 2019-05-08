@@ -5,7 +5,7 @@ $user = Read-Host -Prompt 'Input your User Display Name'
 New-AzKeyVault `
   -Name $vName `
   -ResourceGroupName $resourceGroup `
-  -Location 'East Asia'
+  -Location 'Japan East'
 
 Set-AzKeyVaultAccessPolicy `
   -VaultName $vName `
