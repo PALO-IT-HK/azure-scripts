@@ -1,0 +1,7 @@
+{
+  "VMAction": "Start",
+  "ResourceGroup": "TrainingResource",
+  "name": "clemyking",
+  "aaName": "clemyking-autoacct",
+  "startTime": "9AM"
+}
