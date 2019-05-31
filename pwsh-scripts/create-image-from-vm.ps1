@@ -1,7 +1,8 @@
-$vmName = Read-Host -Prompt 'Input your VM name'
-$rgName = Read-Host -Prompt 'Input your Resource Group Name'
-$location = "eastasia"
-$imageName = $vmName"ImageFromVM"
+$json = (Get-Content -Raw -path './pwsh-scripts/goldenimg-params.json' | Out-String | ConvertFrom-Json)
+$vmName = $json.vmName
+$rgName = $json.rgName
+$location = $json.location
+$imageName = $json.imageName
 
 Stop-AzVM `
   -ResourceGroupName $rgName `
@@ -18,7 +19,8 @@ $vm = Get-AzVM `
 
 $image = New-AzImageConfig `
   -Location $location `
-  -SourceVirtualMachineId $vm.Id
+  -SourceVirtualMachineId $vm.Id `
+  -ZoneResilient
 
 New-AzImage `
   -Image $image `

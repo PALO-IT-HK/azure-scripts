@@ -1,15 +1,21 @@
-$vmName = Read-Host -Prompt 'Input your VM name'
-$rgName = Read-Host -Prompt 'Input your Resource Group Name'
-$location = "eastasia"
-$imageName = $vmName"ImageFromVM"
+$json = (Get-Content -Raw -path './pwsh-scripts/vmfromimg-params.json' | Out-String | ConvertFrom-Json)
+
+$vmName = $json.vmName
+$rgName = $json.rgName
+$location = $json.location
+$imageName = $json.imageName
+$User = $json.User
+$Password = ConvertTo-SecureString $json.Password -AsPlainText -Force
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, $Password
 
 New-AzVm `
+  -Credential $Credential `
   -ResourceGroupName $rgName `
-  -Name $vmName"FromImage" `
+  -Name $vmName `
   -ImageName $imageName `
-  -Location "eastasia" `
-  -VirtualNetworkName $imageName"Vnet" `
-  -SubnetName $imageName"Subnet" `
-  -SecurityGroupName $imageName"NSG" `
-  -PublicIpAddressName $imageName"PIP" `
+  -Location $location `
+  -VirtualNetworkName $vmName"VNET" `
+  -SubnetName $vmName"Subnet" `
+  -SecurityGroupName $vmName"NSG" `
+  -PublicIpAddressName $vmName"PIP" `
   -OpenPorts 3389

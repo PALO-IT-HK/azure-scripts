@@ -9,12 +9,6 @@ $resourceGroupName = "TrainingResource"
 $storageAccountName = $projectNamePrefix + "store"
 $containerName = "linkedtemplates" # The name of the Blob container to be created.
 
-# $linkedTemplateURL = "https://armtutorials.blob.core.windows.net/linkedtemplates/linkedStorageAccount.json" # A completed linked template used in this tutorial.
-# $fileName = "StorageAccount.json" # A file name used for downloading and uploading the linked template.
-
-# # Download the tutorial linked template
-# Invoke-WebRequest -Uri $linkedTemplateURL -OutFile "$home/$fileName"
-
 # Create a resource group
 New-AzResourceGroup -Name $resourceGroupName -Location $location
 
@@ -38,7 +32,7 @@ if(!$storageAccount.Id -and $storageAccount.ProvisioningState -eq 'Running') {
 
 $context = $storageAccount.Context
 
-$templateFiles = Get-ChildItem -Path './templates'
+$templateFiles = Get-ChildItem -Path './arm-templates/linked-templates'
 
 foreach ($template in $templateFiles) {
   $fileName = $template.Name

@@ -106,18 +106,18 @@ Unregister-AzAutomationScheduledRunbook `
   –ScheduleName $name"-morning-startvm" `
   -Force
 
-# Unregister-AzAutomationScheduledRunbook `
-#   –AutomationAccountName $aaName `
-#   -ResourceGroupName $resourceGroup `
-#   –Name 'startstopvms' `
-#   –ScheduleName $name"-evening-stopvm" `
-#   -Force
+Unregister-AzAutomationScheduledRunbook `
+  –AutomationAccountName $aaName `
+  -ResourceGroupName $resourceGroup `
+  –Name 'startstopvms' `
+  –ScheduleName $name"-evening-stopvm" `
+  -Force
 
 $startParams = @{"VMAction"=$json.VMAction}
 # $stopParams = @{"VMAction"="Stop"}
 
 write-output $startParams
-# write-output $stopParams
+write-output $stopParams
 
 Register-AzAutomationScheduledRunbook `
   –AutomationAccountName $aaName `
@@ -126,9 +126,9 @@ Register-AzAutomationScheduledRunbook `
   –ScheduleName $name"-morning-startvm" `
   –Parameters $startParams
 
-# Register-AzAutomationScheduledRunbook `
-#   –AutomationAccountName $aaName `
-#   -ResourceGroupName $resourceGroup `
-#   –Name 'startstopvms' `
-#   –ScheduleName $name"-evening-stopvm" `
-#   –Parameters $stopParams
+Register-AzAutomationScheduledRunbook `
+  –AutomationAccountName $aaName `
+  -ResourceGroupName $resourceGroup `
+  –Name 'startstopvms' `
+  –ScheduleName $name"-evening-stopvm" `
+  –Parameters $stopParams

@@ -1,54 +1,30 @@
 <#
  .SYNOPSIS
     Deploys a template to Azure
-
  .DESCRIPTION
     Deploys an Azure Resource Manager template
-
  .PARAMETER subscriptionId
     The subscription id where the template will be deployed.
-
  .PARAMETER resourceGroupName
     The resource group where the template will be deployed. Can be the name of an existing or a new resource group.
-
- .PARAMETER resourceGroupLocation
+ .PARAMETER location
     Optional, a resource group location. If specified, will try to create a new resource group in this location. If not specified, assumes resource group is existing.
-
  .PARAMETER deploymentName
     The deployment name.
-
  .PARAMETER templateFilePath
     Optional, path to the template file. Defaults to template.json.
-
  .PARAMETER parametersFilePath
     Optional, path to the parameters file. Defaults to parameters.json. If file is not found, will prompt for parameter values based on template.
 #>
 
-param(
- [Parameter(Mandatory=$True)]
- [string]
- $subscriptionId,
+$json = (Get-Content -Raw -path './pwsh-scripts/arm-params2.json' | Out-String | ConvertFrom-Json)
 
- [Parameter(Mandatory=$True)]
- [string]
- $resourceGroupName,
-
- [string]
- $resourceGroupLocation,
-
- [Parameter(Mandatory=$True)]
- [string]
- $deploymentName,
-
- [string]
-#  $templateFilePath = "azuredeploy.json",
-#  $templateFilePath = "linkedtemplate.json",
- $templateFilePath = "template.json",
-
- [string]
-#  $parametersFilePath = "linked-parameters.json"
- $parametersFilePath = "parameters.json"
-)
+$subscriptionId = $json.subscriptionId
+$resourceGroupName = $json.resourceGroupName
+$location = $json.location
+$deploymentName = $json.deploymentName
+$templateFilePath = $json.templateFilePath
+$parametersFilePath = $json.parametersFilePath
 
 <#
 .SYNOPSIS
@@ -56,9 +32,8 @@ param(
 #>
 Function RegisterRP {
     Param(
-        [string]$ResourceProviderNamespace
+      [string]$ResourceProviderNamespace
     )
-
     Write-Host "Registering resource provider '$ResourceProviderNamespace'";
     Register-AzResourceProvider -ProviderNamespace $ResourceProviderNamespace;
 }
@@ -109,13 +84,13 @@ $resourceGroup = Get-AzResourceGroup `
 if(!$resourceGroup)
 {
     Write-Host "Resource group '$resourceGroupName' does not exist. To create a new resource group, please enter a location.";
-    if(!$resourceGroupLocation) {
-      $resourceGroupLocation = Read-Host "resourceGroupLocation";
+    if(!$location) {
+      $location = Read-Host "location";
     }
-    Write-Host "Creating resource group '$resourceGroupName' in location '$resourceGroupLocation'";
+    Write-Host "Creating resource group '$resourceGroupName' in location '$location'";
     New-AzResourceGroup `
       -Name $resourceGroupName `
-      -Location $resourceGroupLocation
+      -Location $location
 }
 else{
     Write-Host "Using existing resource group '$resourceGroupName'";
