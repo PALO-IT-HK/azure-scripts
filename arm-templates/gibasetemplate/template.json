@@ -166,6 +166,29 @@
                     }
                 }
             }
+        },
+        {
+            "apiVersion": "2018-06-01",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('virtualMachineName'),'/DevOpsAgentInstall')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+              "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.9",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/PALO-IT-HK/azure-scripts/master/pwsh-scripts/install-agent.ps1"
+                    ]
+                },
+                "protectedSettings": {
+                  "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File install-agent.ps1"
+                }
+            }
         }
     ],
     "outputs": {
